@@ -118,3 +118,60 @@ session.sendline('exit')
 
 # Terminate SSH session
 session.close()
+
+from netmiko import ConnectHandler
+import difflib
+
+device = {
+    'device_type': 'cisco_ios',
+    'ip': '192.168.56.101',       
+    'username': 'prne',       
+    'password': 'cisco123!',     
+    'secret': 'class123!' 
+}
+
+
+connection = ConnectHandler(**device)
+connection.enable()  
+
+running_config = connection.send_command('show running-config')
+
+startup_config = connection.send_command('show startup-config')
+
+
+with open('running_config.txt', 'w') as run_file:
+    run_file.write(running_config)
+
+
+with open('startup_config.txt', 'w') as start_file:
+    start_file.write(startup_config)
+
+
+connection.disconnect()
+
+
+print("Configs retrieved and stored successfully.")
+
+
+def compare_configs(file1, file2):
+    with open(file1, 'r') as f1, open(file2, 'r') as f2:
+        
+        running_lines = f1.readlines()
+        startup_lines = f2.readlines()
+        
+       
+        diff = difflib.unified_diff(
+            running_lines, 
+            startup_lines, 
+            fromfile='Running Config', 
+            tofile='Startup Config', 
+            lineterm=''
+        )
+        
+       
+        print("\nDifferences between Running and Startup Configurations:\n")
+        for line in diff:
+            print(line)
+
+
+compare_configs('running_config.txt', 'startup_config.txt')
