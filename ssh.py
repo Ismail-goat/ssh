@@ -175,3 +175,32 @@ def compare_configs(file1, file2):
 
 
 compare_configs('running_config.txt', 'startup_config.txt')
+
+from netmiko import ConnectHandler
+
+device = {
+    'device_type': 'cisco_ios',
+    'ip': '192.168.56.101',       
+    'username': 'prne',        
+    'password': 'cisco123!',     
+    'secret': 'class123!' 
+}
+syslog_server_ip = "192.168.56.101"  
+
+connection = ConnectHandler(**device)
+connection.enable()  
+
+
+commands = [
+    f"logging host {syslog_server_ip}",
+    "logging trap informational",     
+    "logging on"                     
+]
+output = connection.send_config_set(commands)
+
+
+connection.disconnect()
+
+
+print("Syslog configuration output:\n", output)
+print(f"Syslog configured to send logs to {syslog_server_ip}.")
