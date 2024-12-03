@@ -204,3 +204,33 @@ connection.disconnect()
 
 print("Syslog configuration output:\n", output)
 print(f"Syslog configured to send logs to {syslog_server_ip}.")
+
+from netmiko import ConnectHandler
+
+router = {
+    'device_type': 'cisco_ios',
+    'host': '192.168.56.101',
+    'username': 'prne',
+    'password': 'cisco123!',
+    'secret': 'class123!',
+}
+
+connection = ConnectHandler(**router)
+connection.enable()
+
+commands = [
+    'interface Loopback0',
+    'ip address 192.168.1.1 255.255.255.255',
+    'description Loopback Interface',
+    'interface GigabitEthernet2',
+    'ip address 1.1.1.1 255.255.255.0',
+    'description LAN Interface',
+    'no shutdown',
+    'ip route 0.0.0.0 0.0.0.0 10.0.0.2',
+]
+
+output = connection.send_config_set(commands)
+print(output)
+
+connection.disconnect()
+
