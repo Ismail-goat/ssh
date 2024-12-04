@@ -233,4 +233,33 @@ output = connection.send_config_set(commands)
 print(output)
 
 connection.disconnect()
+from netmiko import ConnectHandler
 
+router = {
+    'device_type': 'cisco_ios',
+    'host': '192.168.56.101',
+    'username': 'prne',
+    'password': 'cisco123!',
+    'secret': 'class123!',
+}
+
+net_connect = ConnectHandler(**router)
+net_connect.enable()
+
+rip_config = [
+    'router rip',
+    'version 2',
+    'network 192.168.56.0',
+    'network 11.1.1.0',
+    'network 192.168.1.0',
+]
+
+output = net_connect.send_config_set(rip_config)
+print('Configuration Output: ')
+print(output)
+
+verification_output = net_connect.send_command('show ip protocols')
+print('\nVerification Output: ')
+print(verification_output)
+
+net_connect.disconnect()
